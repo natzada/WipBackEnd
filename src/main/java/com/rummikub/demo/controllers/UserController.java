@@ -8,6 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
 @RestController
@@ -90,64 +94,53 @@ public class UserController {
         }
     }
 
-    // Endpoint para upload de foto de perfil
     @PutMapping("/{id}/profile-picture")
     public ResponseEntity<User> uploadProfilePicture(
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file) {
         try {
             System.out.println("🖼️ Recebendo upload de foto para usuário ID: " + id);
-            System.out.println("📁 Arquivo: " + file.getOriginalFilename());
-            System.out.println("📏 Tamanho: " + file.getSize() + " bytes");
-            
+
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest().body(null);
             }
-            
-            // Validar tipo de arquivo
-            String contentType = file.getContentType();
-            if (contentType == null || !contentType.startsWith("image/")) {
+
+            // Valida imagem
+            if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
                 return ResponseEntity.badRequest().body(null);
             }
-            
-            // Validar tamanho do arquivo (máx 5MB)
-            if (file.getSize() > 5 * 1024 * 1024) {
-                return ResponseEntity.badRequest().body(null);
+
+            // Nome final do arquivo
+            String fileName = "profile_" + id + "_" + System.currentTimeMillis()
+                    + getFileExtension(file.getOriginalFilename());
+
+            // Caminho onde será salva
+            Path uploadPath = Paths.get("uploads");
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
             }
-            
-            // Buscar usuário
-            User existingUser = userService.getUser(id);
-            if (existingUser == null) {
-                return ResponseEntity.notFound().build();
-            }
-            
-            // Aqui você pode:
-            // 1. Salvar o arquivo no sistema de arquivos
-            // 2. Salvar o arquivo no banco de dados
-            // 3. Fazer upload para um serviço de cloud (AWS S3, etc.)
-            
-            // Por enquanto, vamos apenas simular o salvamento
-            String fileName = "profile_" + id + "_" + System.currentTimeMillis() + 
-                             getFileExtension(file.getOriginalFilename());
-            
-            // Simular salvamento - em produção, implemente isso
-            System.out.println("💾 Simulando salvamento do arquivo: " + fileName);
-            
-            // Atualizar o caminho da foto no usuário
-            existingUser.setProfilePicturePath(fileName);
-            User updatedUser = userService.updateUser(existingUser);
-            
-            System.out.println("✅ Foto de perfil atualizada: " + fileName);
-            return ResponseEntity.ok(updatedUser);
-            
+
+            // Salva a imagem fisicamente
+            Files.copy(file.getInputStream(), uploadPath.resolve(fileName),
+                    StandardCopyOption.REPLACE_EXISTING);
+
+            System.out.println("💾 Foto salva em: uploads/" + fileName);
+
+            // Atualiza o usuário
+            User user = userService.getUser(id);
+            user.setProfilePicturePath(fileName);
+
+            User updated = userService.updateUser(user);
+
+            System.out.println("✅ Foto de perfil atualizada");
+            return ResponseEntity.ok(updated);
+
         } catch (Exception e) {
             System.err.println("❌ Erro ao fazer upload da foto: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
-    }
-
-    // Método auxiliar para obter extensão do arquivo
+    }    // Método auxiliar para obter extensão do arquivo
     private String getFileExtension(String fileName) {
         if (fileName == null) return "";
         int lastDot = fileName.lastIndexOf(".");
@@ -155,7 +148,7 @@ public class UserController {
     }
 
     // Endpoint para servir foto de perfil
-    @GetMapping("/profile-picture/{filename}")
+    @GetMapping
     public ResponseEntity<byte[]> getProfilePicture(@PathVariable String filename) {
         try {
             System.out.println("🖼️ Solicitando foto: " + filename);
