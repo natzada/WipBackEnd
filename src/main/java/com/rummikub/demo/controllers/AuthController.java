@@ -76,7 +76,18 @@ public class AuthController {
             
             if (user != null) {
                 String mockToken = "mock-jwt-token-" + user.getId();
-                JwtResponse response = new JwtResponse(mockToken, user.getName());
+                
+                // ✅ RETORNAR TODAS AS INFORMAÇÕES DO USUÁRIO
+                JwtResponse response = new JwtResponse(
+                    mockToken, 
+                    user.getName(),
+                    user.getId(), // ← ADICIONAR ID
+                    user.getEmail(),
+                    user.getCompanyName(), // ← ADICIONAR COMPANY NAME
+                    user.getCreationDate() // ← ADICIONAR CREATION DATE
+                );
+                
+                System.out.println("✅ Login bem-sucedido para usuário ID: " + user.getId());
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.status(401).body("Credenciais inválidas");
@@ -95,8 +106,16 @@ public class AuthController {
             
             User newUser = authService.register(signUpRequest);
             
+            // ✅ GARANTIR que o ID está sendo retornado
             String mockToken = "mock-jwt-token-" + newUser.getId();
-            JwtResponse response = new JwtResponse(mockToken, newUser.getName());
+            JwtResponse response = new JwtResponse(
+                mockToken, 
+                newUser.getName(),
+                newUser.getId(), // ← ADICIONAR ID AQUI
+                newUser.getEmail(),
+                newUser.getCompanyName(),
+                newUser.getCreationDate()
+            );
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {

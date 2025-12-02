@@ -42,6 +42,7 @@ public class AuthService {
         newUser.setName(signUpRequest.getName());
         newUser.setEmail(signUpRequest.getEmail());
         newUser.setPassword(signUpRequest.getPassword());
+        newUser.setCompanyName(signUpRequest.getCompanyName()); // ← ADICIONAR COMPANY NAME AQUI
         newUser.setPreferences("{}");
 
         User savedUser = userRepository.save(newUser);

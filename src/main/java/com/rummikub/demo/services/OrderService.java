@@ -1,12 +1,13 @@
+// src/main/java/com/rummikub/demo/services/OrderService.java
 package com.rummikub.demo.services;
 
 import com.rummikub.demo.entities.Order;
+import java.util.List;
+import java.util.Optional;
 
 public interface OrderService {
+    List<Order> getAllOrders();
+    List<Order> getOrdersByUserId(Long userId);
     Order createOrder(Order order);
+    Optional<Order> getOrderById(Long id);
 }
-
-// MétodO quE criA uM novO pedidO e o retornA
-// Order é umA classE quE representA uM pediDo, coM dadoS tipO ID, clieNte, itEns, etc.
-
-// EX: É coM o "gerentE" q recebE uM pedidO e registrA elE no sistemA

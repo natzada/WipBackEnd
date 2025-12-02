@@ -1,20 +1,12 @@
 package com.rummikub.demo.dto;
 
 public class SignUpRequest {
-    private String name;     // Mudou de username para name
+    private String name;
     private String email;
     private String password;
     private String verificationCode;
-
-    public SignUpRequest() {}
+    private String companyName; // ← VERIFICAR SE EXISTE ESTE CAMPO
     
-    public SignUpRequest(String name, String email, String password, String verificationCode) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.verificationCode = verificationCode;
-    }
-
     // Getters e Setters
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -27,4 +19,7 @@ public class SignUpRequest {
     
     public String getVerificationCode() { return verificationCode; }
     public void setVerificationCode(String verificationCode) { this.verificationCode = verificationCode; }
+    
+    public String getCompanyName() { return companyName; } // ← GETTER
+    public void setCompanyName(String companyName) { this.companyName = companyName; } // ← SETTER
 }

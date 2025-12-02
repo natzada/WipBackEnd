@@ -1,80 +1,74 @@
+// src/main/java/com/rummikub/demo/entities/Order.java
 package com.rummikub.demo.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "orders")
-@Data
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
-
+    
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
+    
+    @Column(name = "quantity", nullable = false)
     private Integer quantity;
-
-    @ManyToOne
-    @JoinColumn(name = "supplier_id")
-    private Supplier supplier;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    private LocalDateTime orderDate;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
-	}
-
-	public Integer getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
-	}
-
-	public Supplier getSupplier() {
-		return supplier;
-	}
-
-	public void setSupplier(Supplier supplier) {
-		this.supplier = supplier;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public LocalDateTime getOrderDate() {
-		return orderDate;
-	}
-
-	public void setOrderDate(LocalDateTime orderDate) {
-		this.orderDate = orderDate;
-	}
     
+    @Column(name = "supplier_id", nullable = false)
+    private Long supplierId;
     
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+    
+    @Column(name = "order_date", nullable = false)
+    private LocalDate orderDate;
+    
+    @Column(name = "status")
+    private String status = "PENDING";
+    
+    // Construtores
+    public Order() {}
+    
+    public Order(Long productId, Integer quantity, Long supplierId, Long userId, LocalDate orderDate) {
+        this.productId = productId;
+        this.quantity = quantity;
+        this.supplierId = supplierId;
+        this.userId = userId;
+        this.orderDate = orderDate;
+    }
+    
+    @PrePersist
+    protected void onCreate() {
+        if (orderDate == null) {
+            orderDate = LocalDate.now();
+        }
+        if (status == null) {
+            status = "PENDING";
+        }
+    }
+    
+    // Getters e Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
+    
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    
+    public Long getSupplierId() { return supplierId; }
+    public void setSupplierId(Long supplierId) { this.supplierId = supplierId; }
+    
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    
+    public LocalDate getOrderDate() { return orderDate; }
+    public void setOrderDate(LocalDate orderDate) { this.orderDate = orderDate; }
+    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
